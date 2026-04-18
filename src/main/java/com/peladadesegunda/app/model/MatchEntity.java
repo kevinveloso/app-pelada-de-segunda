@@ -2,6 +2,8 @@ package com.peladadesegunda.app.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -9,7 +11,8 @@ import java.util.Set;
 
 @Entity
 @Table(name = "football_match")
-@Data
+@Getter
+@Setter
 public class MatchEntity {
 
     @Id
@@ -23,11 +26,6 @@ public class MatchEntity {
     @Column(name = "max_players", nullable = false)
     private Integer maxPlayers;
 
-    @ManyToMany
-    @JoinTable(
-            name = "match_player",
-            joinColumns = @JoinColumn(name = "id_match"),
-            inverseJoinColumns = @JoinColumn(name = "id_user")
-    )
-    private Set<UserEntity> playerSet = new HashSet<>();
+    @OneToMany(mappedBy = "match", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<MatchPlayerEntity> matchPlayerSet = new HashSet<>();
 }

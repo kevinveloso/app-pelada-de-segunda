@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 public class MatchDto {
-    public Long matchId;
+    public Long id;
     public Date matchDate;
     public Integer maxPlayers;
     public List<UserDto> subscribedPlayerList;

@@ -1,6 +1,8 @@
 package com.peladadesegunda.app.controller;
 
 import com.peladadesegunda.app.dto.MatchDto;
+import com.peladadesegunda.app.exception.MatchNotFoundException;
+import com.peladadesegunda.app.exception.UserNotFoundException;
 import com.peladadesegunda.app.service.MatchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,7 +25,11 @@ public class MatchController {
 
     @GetMapping("/{id}")
     public ResponseEntity<MatchDto> getMatch(@PathVariable Long id) {
-        return ResponseEntity.ok(this.matchService.getMatch(id));
+        try {
+            return ResponseEntity.ok(this.matchService.getMatch(id));
+        } catch (MatchNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     @PostMapping
@@ -32,24 +38,28 @@ public class MatchController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdMatch);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<MatchDto> updateMatch(@RequestParam Long id, @RequestBody MatchDto match) {
-        return ResponseEntity.ok(this.matchService.updateMatch(id, match));
+    @PutMapping
+    public ResponseEntity<MatchDto> updateMatch(@RequestBody MatchDto match) {
+        return ResponseEntity.ok(this.matchService.updateMatch(match));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteMatch(@RequestParam Long id) {
+    public ResponseEntity<Void> deleteMatch(@PathVariable Long id) {
         this.matchService.deleteMatch(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{matchId}/add-player/{playerUsername}")
-    public ResponseEntity<MatchDto> addPlayerToMatch(@RequestParam Long matchId, @RequestParam String playerUsername) {
-        return ResponseEntity.ok(this.matchService.addPlayerToMatch(matchId, playerUsername));
+    public ResponseEntity<MatchDto> addPlayerToMatch(@PathVariable Long matchId, @PathVariable String playerUsername) {
+        try {
+            return ResponseEntity.ok(this.matchService.addPlayerToMatch(matchId, playerUsername));
+        } catch (MatchNotFoundException | UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     @GetMapping("/{matchId}/remove-player/{playerUsername}")
-    public ResponseEntity<MatchDto> removePlayerFromMatch(@RequestParam Long matchId, @RequestParam String playerUsername) {
+    public ResponseEntity<MatchDto> removePlayerFromMatch(@PathVariable Long matchId, @PathVariable String playerUsername) {
         return ResponseEntity.ok(this.matchService.removePlayerFromMatch(matchId, playerUsername));
     }
 }

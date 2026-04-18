@@ -36,8 +36,9 @@ CREATE TABLE IF NOT EXISTS match_player (
   id_user BIGINT NOT NULL,
   id_match BIGINT NOT NULL,
   team INTEGER,
+  goals_scored INTEGER,
   subscription_date TIMESTAMP NOT NULL,
-  was_present BOOLEAN NOT NULL DEFAULT FALSE,
+  was_present BOOLEAN DEFAULT FALSE,
   CONSTRAINT uk_match_player_user_match UNIQUE (id_user, id_match),
   FOREIGN KEY (id_user) REFERENCES app_user(id),
   FOREIGN KEY (id_match) REFERENCES football_match(id)

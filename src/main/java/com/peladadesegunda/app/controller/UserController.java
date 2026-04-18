@@ -2,6 +2,7 @@ package com.peladadesegunda.app.controller;
 
 import com.peladadesegunda.app.dto.PerformanceEvaluationDto;
 import com.peladadesegunda.app.dto.UserDto;
+import com.peladadesegunda.app.exception.UserNotFoundException;
 import com.peladadesegunda.app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,8 +24,12 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDto> getUser(@RequestParam Long id) {
-        return ResponseEntity.ok(this.userService.getUser(id));
+    public ResponseEntity<UserDto> getUser(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(this.userService.getUser(id));
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     @PostMapping
@@ -33,20 +38,20 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<UserDto> updateUser(@RequestParam Long id, @RequestBody UserDto user) {
-        return ResponseEntity.ok(this.userService.updateUser(id, user));
+    @PutMapping
+    public ResponseEntity<UserDto> updateUser(@RequestBody UserDto user) {
+        return ResponseEntity.ok(this.userService.updateUser(user));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@RequestParam Long id) {
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         this.userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
 
 
     @PostMapping("/evaluation")
-    public ResponseEntity<Void> evaluatePerformances(@RequestBody PerformanceEvaluationDto performanceEvaluationDto) {
+    public ResponseEntity<Void> evaluatePerformances(@PathVariable PerformanceEvaluationDto performanceEvaluationDto) {
         this.userService.evaluatePerformances(performanceEvaluationDto);
         return ResponseEntity.noContent().build();
     }

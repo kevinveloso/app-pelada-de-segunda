@@ -4,6 +4,8 @@ import com.peladadesegunda.app.enumeration.Position;
 import com.peladadesegunda.app.enumeration.UserRole;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -12,7 +14,8 @@ import java.util.Set;
 
 @Entity
 @Table(name = "app_user")
-@Data
+@Getter
+@Setter
 public class UserEntity {
 
     @Id
@@ -56,4 +59,7 @@ public class UserEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "position_name", nullable = false, length = 50)
     private Set<Position> positionSet = new HashSet<>();
+
+    @OneToMany(mappedBy = "user")
+    private Set<MatchPlayerEntity> matchPlayerSet = new HashSet<>();
 }
