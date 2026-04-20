@@ -2,7 +2,9 @@ package com.peladadesegunda.app.controller;
 
 import com.peladadesegunda.app.dto.MatchDto;
 import com.peladadesegunda.app.exception.MatchNotFoundException;
+import com.peladadesegunda.app.exception.PlayerAlreadyInMatchException;
 import com.peladadesegunda.app.exception.UserNotFoundException;
+import com.peladadesegunda.app.exception.UserNotInMatchException;
 import com.peladadesegunda.app.service.MatchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -51,15 +53,25 @@ public class MatchController {
 
     @GetMapping("/{matchId}/add-player/{playerUsername}")
     public ResponseEntity<MatchDto> addPlayerToMatch(@PathVariable Long matchId, @PathVariable String playerUsername) {
+        ResponseEntity<MatchDto> response = null;
+
         try {
-            return ResponseEntity.ok(this.matchService.addPlayerToMatch(matchId, playerUsername));
+            response = ResponseEntity.ok(this.matchService.addPlayerToMatch(matchId, playerUsername));
         } catch (MatchNotFoundException | UserNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            response = ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (PlayerAlreadyInMatchException e) {
+            response = ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
+        return response;
     }
 
-    @GetMapping("/{matchId}/remove-player/{playerUsername}")
+    @DeleteMapping("/{matchId}/remove-player/{playerUsername}")
     public ResponseEntity<MatchDto> removePlayerFromMatch(@PathVariable Long matchId, @PathVariable String playerUsername) {
-        return ResponseEntity.ok(this.matchService.removePlayerFromMatch(matchId, playerUsername));
+        try {
+            this.matchService.removePlayerFromMatch(matchId, playerUsername);
+            return ResponseEntity.noContent().build();
+        } catch (MatchNotFoundException | UserNotInMatchException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 }

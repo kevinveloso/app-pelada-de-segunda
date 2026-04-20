@@ -33,7 +33,7 @@ public abstract class AbstractMatchMapper {
 
         if (matchPlayerEntityList.size() > matchEntity.getMaxPlayers()) {
             return this.abstractUserMapper.toUserDtoList(matchPlayerEntityList
-                    .subList(0, matchEntity.getMaxPlayers() - 1).stream().map(MatchPlayerEntity::getUser).toList());
+                    .subList(0, matchEntity.getMaxPlayers()).stream().map(MatchPlayerEntity::getUser).toList());
         }
 
         return this.abstractUserMapper.toUserDtoList(matchPlayerEntityList.stream().map(MatchPlayerEntity::getUser).toList());
@@ -44,7 +44,7 @@ public abstract class AbstractMatchMapper {
 
         if (matchPlayerEntityList.size() > matchEntity.getMaxPlayers()) {
             return this.abstractUserMapper.toUserDtoList(matchPlayerEntityList
-                    .subList(0, matchEntity.getMaxPlayers() - 1).stream().map(MatchPlayerEntity::getUser).toList());
+                    .subList(matchEntity.getMaxPlayers(), matchPlayerEntityList.size()).stream().map(MatchPlayerEntity::getUser).toList());
         }
 
         return new ArrayList<>();

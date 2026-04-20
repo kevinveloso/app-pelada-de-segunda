@@ -2,7 +2,9 @@ package com.peladadesegunda.app.service.Impl;
 
 import com.peladadesegunda.app.dto.MatchDto;
 import com.peladadesegunda.app.exception.MatchNotFoundException;
+import com.peladadesegunda.app.exception.PlayerAlreadyInMatchException;
 import com.peladadesegunda.app.exception.UserNotFoundException;
+import com.peladadesegunda.app.exception.UserNotInMatchException;
 import com.peladadesegunda.app.mapper.AbstractMatchMapper;
 import com.peladadesegunda.app.model.MatchEntity;
 import com.peladadesegunda.app.model.MatchPlayerEntity;
@@ -11,9 +13,10 @@ import com.peladadesegunda.app.repository.MatchPlayerRepository;
 import com.peladadesegunda.app.repository.MatchRepository;
 import com.peladadesegunda.app.repository.UserRepository;
 import com.peladadesegunda.app.service.MatchService;
-import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -74,12 +77,14 @@ public class MatchServiceImpl implements MatchService {
     }
 
     @Override
+    @Transactional
     public void deleteMatch(Long id) {
         this.matchRepository.deleteById(id);
     }
 
     @Override
-    public MatchDto addPlayerToMatch(Long matchId, String playerUsername) throws UserNotFoundException, MatchNotFoundException {
+    public MatchDto addPlayerToMatch(Long matchId, String playerUsername) throws UserNotFoundException,
+            MatchNotFoundException, PlayerAlreadyInMatchException {
         Optional<UserEntity> userEntityOptional = this.userRepository.findByUsername(playerUsername);
         Optional<MatchEntity> matchEntityOptional = this.matchRepository.findById(matchId);
 
@@ -91,13 +96,26 @@ public class MatchServiceImpl implements MatchService {
         matchPlayerEntity.setMatch(matchEntityOptional.get());
         matchPlayerEntity.setSubscriptionDate(new Date());
 
-        MatchPlayerEntity savedMatchPlayerEntity = this.matchPlayerRepository.save(matchPlayerEntity);
+        try {
+            MatchPlayerEntity savedMatchPlayerEntity = this.matchPlayerRepository.save(matchPlayerEntity);
 
-        return this.matchMapper.toMatchDto(savedMatchPlayerEntity.getMatch());
+            return this.matchMapper.toMatchDto(savedMatchPlayerEntity.getMatch());
+        } catch (DataIntegrityViolationException e) {
+            throw new PlayerAlreadyInMatchException(playerUsername);
+        }
     }
 
     @Override
-    public MatchDto removePlayerFromMatch(Long matchId, String playerUsername) {
-        return null;
+    @Transactional
+    public void removePlayerFromMatch(Long matchId, String playerUsername) throws MatchNotFoundException, UserNotInMatchException {
+        this.matchRepository.findById(matchId)
+                .orElseThrow(() -> new MatchNotFoundException(String.valueOf(matchId)));
+
+        MatchPlayerEntity matchPlayer = this.matchPlayerRepository
+                .findByUser_UsernameAndMatch_Id(playerUsername, matchId)
+                .orElseThrow(() -> new UserNotInMatchException(playerUsername));
+
+        this.matchPlayerRepository.delete(matchPlayer);
+        this.matchPlayerRepository.flush();
     }
 }
