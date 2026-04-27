@@ -1,5 +1,6 @@
 package com.peladadesegunda.app.controller;
 
+import com.peladadesegunda.app.dto.AddUpdateMatchDto;
 import com.peladadesegunda.app.dto.MatchDto;
 import com.peladadesegunda.app.exception.MatchNotFoundException;
 import com.peladadesegunda.app.exception.PlayerAlreadyInMatchException;
@@ -35,14 +36,18 @@ public class MatchController {
     }
 
     @PostMapping
-    public ResponseEntity<MatchDto> createMatch(@RequestBody MatchDto match) {
+    public ResponseEntity<MatchDto> createMatch(@RequestBody AddUpdateMatchDto match) {
         MatchDto createdMatch = this.matchService.createMatch(match);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdMatch);
     }
 
     @PutMapping
-    public ResponseEntity<MatchDto> updateMatch(@RequestBody MatchDto match) {
-        return ResponseEntity.ok(this.matchService.updateMatch(match));
+    public ResponseEntity<MatchDto> updateMatch(@RequestBody AddUpdateMatchDto match) {
+        try {
+            return ResponseEntity.ok(this.matchService.updateMatch(match));
+        } catch (MatchNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     @DeleteMapping("/{id}")
@@ -51,7 +56,7 @@ public class MatchController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{matchId}/add-player/{playerUsername}")
+    @PostMapping("/{matchId}/add-player/{playerUsername}")
     public ResponseEntity<MatchDto> addPlayerToMatch(@PathVariable Long matchId, @PathVariable String playerUsername) {
         ResponseEntity<MatchDto> response = null;
 

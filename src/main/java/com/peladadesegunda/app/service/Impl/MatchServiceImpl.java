@@ -1,5 +1,6 @@
 package com.peladadesegunda.app.service.Impl;
 
+import com.peladadesegunda.app.dto.AddUpdateMatchDto;
 import com.peladadesegunda.app.dto.MatchDto;
 import com.peladadesegunda.app.exception.MatchNotFoundException;
 import com.peladadesegunda.app.exception.PlayerAlreadyInMatchException;
@@ -18,10 +19,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class MatchServiceImpl implements MatchService {
@@ -59,7 +57,7 @@ public class MatchServiceImpl implements MatchService {
     }
 
     @Override
-    public MatchDto createMatch(MatchDto match) {
+    public MatchDto createMatch(AddUpdateMatchDto match) {
         MatchEntity matchEntity = this.matchMapper.toMatchEntity(match);
 
         MatchEntity savedMatchEntity = this.matchRepository.save(matchEntity);
@@ -68,10 +66,18 @@ public class MatchServiceImpl implements MatchService {
     }
 
     @Override
-    public MatchDto updateMatch(MatchDto match) {
-        MatchEntity matchEntity = this.matchMapper.toMatchEntity(match);
+    public MatchDto updateMatch(AddUpdateMatchDto match) throws MatchNotFoundException {
+        Objects.requireNonNull(match.getId(), "ID can't be null!");
 
-        MatchEntity updatedMatchEntity = this.matchRepository.save(matchEntity);
+        Optional<MatchEntity> matchEntityOptional = this.matchRepository.findById(match.getId());
+
+        if (matchEntityOptional.isEmpty()) throw new MatchNotFoundException(String.valueOf(match.getId()));
+
+        if (Objects.nonNull(match.getMatchDate())) matchEntityOptional.get().setMatchDate(match.getMatchDate());
+
+        if (Objects.nonNull(match.getMaxPlayers())) matchEntityOptional.get().setMaxPlayers(match.getMaxPlayers());
+
+        MatchEntity updatedMatchEntity = this.matchRepository.save(matchEntityOptional.get());
 
         return this.matchMapper.toMatchDto(updatedMatchEntity);
     }
@@ -85,6 +91,9 @@ public class MatchServiceImpl implements MatchService {
     @Override
     public MatchDto addPlayerToMatch(Long matchId, String playerUsername) throws UserNotFoundException,
             MatchNotFoundException, PlayerAlreadyInMatchException {
+        Objects.requireNonNull(playerUsername, "Player username can't be null!");
+        Objects.requireNonNull(matchId, "Match ID can't be null!");
+
         Optional<UserEntity> userEntityOptional = this.userRepository.findByUsername(playerUsername);
         Optional<MatchEntity> matchEntityOptional = this.matchRepository.findById(matchId);
 
@@ -108,6 +117,9 @@ public class MatchServiceImpl implements MatchService {
     @Override
     @Transactional
     public void removePlayerFromMatch(Long matchId, String playerUsername) throws MatchNotFoundException, UserNotInMatchException {
+        Objects.requireNonNull(playerUsername, "Player username can't be null!");
+        Objects.requireNonNull(matchId, "Match ID can't be null!");
+
         this.matchRepository.findById(matchId)
                 .orElseThrow(() -> new MatchNotFoundException(String.valueOf(matchId)));
 

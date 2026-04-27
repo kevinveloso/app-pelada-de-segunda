@@ -1,5 +1,6 @@
 package com.peladadesegunda.app.mapper;
 
+import com.peladadesegunda.app.dto.AddUpdateMatchDto;
 import com.peladadesegunda.app.dto.MatchDto;
 import com.peladadesegunda.app.dto.UserDto;
 import com.peladadesegunda.app.model.MatchEntity;
@@ -23,7 +24,9 @@ public abstract class AbstractMatchMapper {
             @Mapping(target = "subscribedPlayerList", expression = "java(this.getSubscribedPlayersList(matchEntity))"),
             @Mapping(target = "waitingList", expression = "java(this.getWaitingList(matchEntity))")
     })
-    public abstract MatchDto toMatchDto(MatchEntity matchEntity);
+    public abstract MatchDto toMatchDto(MatchEntity matchEntity);;
+
+    public abstract MatchEntity toMatchEntity(AddUpdateMatchDto addUpdateMatchDto);
 
     public abstract MatchEntity toMatchEntity(MatchDto matchDto);
 

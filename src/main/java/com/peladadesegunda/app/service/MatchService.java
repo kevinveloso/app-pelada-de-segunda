@@ -1,5 +1,6 @@
 package com.peladadesegunda.app.service;
 
+import com.peladadesegunda.app.dto.AddUpdateMatchDto;
 import com.peladadesegunda.app.dto.MatchDto;
 import com.peladadesegunda.app.exception.MatchNotFoundException;
 import com.peladadesegunda.app.exception.PlayerAlreadyInMatchException;
@@ -14,9 +15,9 @@ public interface MatchService {
 
     MatchDto getMatch(Long id) throws MatchNotFoundException;
 
-    MatchDto createMatch(MatchDto match);
+    MatchDto createMatch(AddUpdateMatchDto match);
 
-    MatchDto updateMatch(MatchDto match);
+    MatchDto updateMatch(AddUpdateMatchDto match) throws MatchNotFoundException;
 
     void deleteMatch(Long id);
 
