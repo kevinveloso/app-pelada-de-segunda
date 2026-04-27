@@ -2,6 +2,7 @@ package com.peladadesegunda.app.controller;
 
 import com.peladadesegunda.app.dto.PerformanceEvaluationDto;
 import com.peladadesegunda.app.dto.UserDto;
+import com.peladadesegunda.app.exception.UsernameAlreadyExistsException;
 import com.peladadesegunda.app.exception.UserNotFoundException;
 import com.peladadesegunda.app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,13 +35,25 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<UserDto> createUser(@RequestBody UserDto user) {
-        UserDto createdUser = this.userService.createUser(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+        try {
+            UserDto createdUser = this.userService.createUser(user);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+        } catch (UsernameAlreadyExistsException e) {
+           return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
     }
 
     @PutMapping
     public ResponseEntity<UserDto> updateUser(@RequestBody UserDto user) {
-        return ResponseEntity.ok(this.userService.updateUser(user));
+        ResponseEntity<UserDto> response = null;
+        try {
+            response = ResponseEntity.ok(this.userService.updateUser(user));
+        } catch (UserNotFoundException e) {
+            response = ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (UsernameAlreadyExistsException e) {
+            response = ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        return response;
     }
 
     @DeleteMapping("/{id}")

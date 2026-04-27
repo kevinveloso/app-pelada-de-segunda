@@ -2,17 +2,17 @@ package com.peladadesegunda.app.service.Impl;
 
 import com.peladadesegunda.app.dto.PerformanceEvaluationDto;
 import com.peladadesegunda.app.dto.UserDto;
+import com.peladadesegunda.app.exception.UsernameAlreadyExistsException;
 import com.peladadesegunda.app.exception.UserNotFoundException;
 import com.peladadesegunda.app.mapper.AbstractUserMapper;
 import com.peladadesegunda.app.model.UserEntity;
 import com.peladadesegunda.app.repository.UserRepository;
 import com.peladadesegunda.app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -46,21 +46,42 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto createUser(UserDto user) {
+    public UserDto createUser(UserDto user) throws UsernameAlreadyExistsException {
         UserEntity userEntity = this.userMapper.toUserEntity(user);
 
-        UserEntity savedUserEntity = this.userRepository.save(userEntity);
+        try {
+            UserEntity savedUserEntity = this.userRepository.save(userEntity);
 
-        return this.userMapper.toUserDto(savedUserEntity);
+            return this.userMapper.toUserDto(savedUserEntity);
+        } catch (DataIntegrityViolationException e) {
+            throw new UsernameAlreadyExistsException(user.getUsername());
+        }
     }
 
     @Override
-    public UserDto updateUser(UserDto user) {
-        UserEntity userEntity = this.userMapper.toUserEntity(user);
+    public UserDto updateUser(UserDto user) throws UserNotFoundException, UsernameAlreadyExistsException {
+        Objects.requireNonNull(user.getId(), "ID can't be null!");
 
-        UserEntity updatedUserEntity = this.userRepository.save(userEntity);
+        Optional<UserEntity> userEntityOptional = this.userRepository.findById(user.getId());
+        if (userEntityOptional.isEmpty()) throw new UserNotFoundException(String.valueOf(user.getId()));
 
-        return this.userMapper.toUserDto(updatedUserEntity);
+        UserEntity userEntity = userEntityOptional.get();
+
+        if (Objects.nonNull(user.getUsername())) userEntity.setUsername(user.getUsername());
+        if (Objects.nonNull(user.getPassword())) userEntity.setPassword(user.getPassword());
+        if (Objects.nonNull(user.getName())) userEntity.setName(user.getName());
+        if (Objects.nonNull(user.getNickname())) userEntity.setNickname(user.getNickname());
+        if (Objects.nonNull(user.getBirthdate())) userEntity.setBirthdate(user.getBirthdate());
+        if (!user.getPositionList().isEmpty()) userEntity.setPositionSet(new HashSet<>(user.getPositionList()));
+        if (Objects.nonNull(user.getRegularMember())) userEntity.setRegularMember(user.getRegularMember());
+
+        try {
+            UserEntity updatedUserEntity = this.userRepository.save(userEntity);
+
+            return this.userMapper.toUserDto(updatedUserEntity);
+        } catch (DataIntegrityViolationException e) {
+            throw new UsernameAlreadyExistsException(user.getUsername());
+        }
     }
 
     @Override
