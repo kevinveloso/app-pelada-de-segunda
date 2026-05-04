@@ -104,7 +104,6 @@ public class UserServiceImpl implements UserService {
 
     }
 
-
     @Override
     public List<MatchFromUserDto> getMatchesFromUser(String username, Pageable pageable) throws UserNotFoundException {
         Optional<UserEntity> userEntityOptional = this.userRepository.findByUsername(username);
@@ -120,6 +119,14 @@ public class UserServiceImpl implements UserService {
         return this.matchMapper.toMatchFromUserDtoList(page.stream().toList());
     }
 
-    //todo get all mensalistas
+    @Override
+    public List<UserDto> getAllRegularMembers() {
+        List<UserEntity> userEntityList = this.userRepository.findByRegularMemberTrueOrderByNameAsc();
 
+        if (userEntityList.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        return this.userMapper.toUserDtoList(userEntityList.stream().toList());
+    }
 }

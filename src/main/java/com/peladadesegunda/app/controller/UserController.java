@@ -64,13 +64,11 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-
     @PostMapping("/evaluation")
     public ResponseEntity<Void> evaluatePerformances(@PathVariable PerformanceEvaluationDto performanceEvaluationDto) {
         this.userService.evaluatePerformances(performanceEvaluationDto);
         return ResponseEntity.noContent().build();
     }
-
 
     @GetMapping("/{username}")
     public ResponseEntity<List<MatchFromUserDto>> getMatchesFromUser(@PathVariable String username, Pageable pageable) {
@@ -79,6 +77,11 @@ public class UserController {
         } catch (UserNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
+    }
+
+    @GetMapping("/regular-members")
+    public ResponseEntity<List<UserDto>> getAllRegularMembers() {
+        return ResponseEntity.ok(this.userService.getAllRegularMembers());
     }
 
 }
