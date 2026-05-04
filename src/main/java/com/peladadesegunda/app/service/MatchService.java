@@ -2,6 +2,7 @@ package com.peladadesegunda.app.service;
 
 import com.peladadesegunda.app.dto.AddUpdateMatchDto;
 import com.peladadesegunda.app.dto.MatchDto;
+import com.peladadesegunda.app.dto.MatchFromUserDto;
 import com.peladadesegunda.app.exception.MatchNotFoundException;
 import com.peladadesegunda.app.exception.PlayerAlreadyInMatchException;
 import com.peladadesegunda.app.exception.UserNotFoundException;
@@ -23,6 +24,8 @@ public interface MatchService {
     void deleteMatch(Long id);
 
     MatchDto addPlayerToMatch(Long matchId, String playerUsername) throws UserNotFoundException, MatchNotFoundException, PlayerAlreadyInMatchException;
+
+    List<MatchFromUserDto> getMatchesFromUser(String username, Pageable pageable) throws UserNotFoundException;
 
     void removePlayerFromMatch(Long matchId, String playerUsername) throws MatchNotFoundException, UserNotInMatchException;
 }

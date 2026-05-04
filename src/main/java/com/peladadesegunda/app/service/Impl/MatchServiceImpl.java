@@ -2,6 +2,7 @@ package com.peladadesegunda.app.service.Impl;
 
 import com.peladadesegunda.app.dto.AddUpdateMatchDto;
 import com.peladadesegunda.app.dto.MatchDto;
+import com.peladadesegunda.app.dto.MatchFromUserDto;
 import com.peladadesegunda.app.exception.MatchNotFoundException;
 import com.peladadesegunda.app.exception.PlayerAlreadyInMatchException;
 import com.peladadesegunda.app.exception.UserNotFoundException;
@@ -132,6 +133,21 @@ public class MatchServiceImpl implements MatchService {
         } catch (DataIntegrityViolationException e) {
             throw new PlayerAlreadyInMatchException(playerUsername);
         }
+    }
+
+    @Override
+    public List<MatchFromUserDto> getMatchesFromUser(String username, Pageable pageable) throws UserNotFoundException {
+        Optional<UserEntity> userEntityOptional = this.userRepository.findByUsername(username);
+
+        if (userEntityOptional.isEmpty()) {
+            throw new UserNotFoundException(username);
+        }
+
+        Page<MatchPlayerEntity> page = this.matchPlayerRepository.findAllByUser_IdOrderByMatch_MatchStartDateAsc(userEntityOptional.get().getId(), pageable);
+
+        if (page.isEmpty()) return new ArrayList<>();
+
+        return this.matchMapper.toMatchFromUserDtoList(page.stream().toList());
     }
 
     @Override

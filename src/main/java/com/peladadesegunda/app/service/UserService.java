@@ -23,7 +23,5 @@ public interface UserService {
 
     void evaluatePerformances(PerformanceEvaluationDto performanceEvaluationDto);
 
-    List<MatchFromUserDto> getMatchesFromUser(String username, Pageable pageable) throws UserNotFoundException;
-
     List<UserDto> getAllRegularMembers();
 }

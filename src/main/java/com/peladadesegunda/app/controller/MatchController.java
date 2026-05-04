@@ -2,6 +2,7 @@ package com.peladadesegunda.app.controller;
 
 import com.peladadesegunda.app.dto.AddUpdateMatchDto;
 import com.peladadesegunda.app.dto.MatchDto;
+import com.peladadesegunda.app.dto.MatchFromUserDto;
 import com.peladadesegunda.app.exception.MatchNotFoundException;
 import com.peladadesegunda.app.exception.PlayerAlreadyInMatchException;
 import com.peladadesegunda.app.exception.UserNotFoundException;
@@ -69,6 +70,15 @@ public class MatchController {
             response = ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         return response;
+    }
+
+    @GetMapping("/{username}")
+    public ResponseEntity<List<MatchFromUserDto>> getMatchesFromUser(@PathVariable String username, Pageable pageable) {
+        try {
+            return ResponseEntity.ok(this.matchService.getMatchesFromUser(username, pageable));
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     @DeleteMapping("/{matchId}/remove-player/{playerUsername}")
