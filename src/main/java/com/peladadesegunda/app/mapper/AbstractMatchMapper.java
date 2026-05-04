@@ -2,6 +2,7 @@ package com.peladadesegunda.app.mapper;
 
 import com.peladadesegunda.app.dto.AddUpdateMatchDto;
 import com.peladadesegunda.app.dto.MatchDto;
+import com.peladadesegunda.app.dto.MatchFromUserDto;
 import com.peladadesegunda.app.dto.UserDto;
 import com.peladadesegunda.app.enumeration.MatchStatus;
 import com.peladadesegunda.app.model.MatchEntity;
@@ -75,4 +76,8 @@ public abstract class AbstractMatchMapper {
         matchPlayerEntityList.sort(Comparator.comparing(MatchPlayerEntity::getSubscriptionDate));
         return matchPlayerEntityList;
     }
+
+
+    public abstract List<MatchFromUserDto> toMatchFromUserDtoList(List<MatchPlayerEntity> matchPlayerEntityList);
+    protected abstract MatchFromUserDto toMatchFromUserDto(MatchPlayerEntity matchPlayerEntity);
 }

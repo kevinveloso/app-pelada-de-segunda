@@ -1,5 +1,6 @@
 package com.peladadesegunda.app.service;
 
+import com.peladadesegunda.app.dto.MatchFromUserDto;
 import com.peladadesegunda.app.dto.PerformanceEvaluationDto;
 import com.peladadesegunda.app.dto.UserDto;
 import com.peladadesegunda.app.exception.UsernameAlreadyExistsException;
@@ -21,4 +22,6 @@ public interface UserService {
     void deleteUser(Long id);
 
     void evaluatePerformances(PerformanceEvaluationDto performanceEvaluationDto);
+
+    List<MatchFromUserDto> getMatchesFromUser(String username, Pageable pageable) throws UserNotFoundException;
 }

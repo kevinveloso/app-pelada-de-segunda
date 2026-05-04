@@ -1,5 +1,6 @@
 package com.peladadesegunda.app.controller;
 
+import com.peladadesegunda.app.dto.MatchFromUserDto;
 import com.peladadesegunda.app.dto.PerformanceEvaluationDto;
 import com.peladadesegunda.app.dto.UserDto;
 import com.peladadesegunda.app.exception.UsernameAlreadyExistsException;
@@ -69,4 +70,15 @@ public class UserController {
         this.userService.evaluatePerformances(performanceEvaluationDto);
         return ResponseEntity.noContent().build();
     }
+
+
+    @GetMapping("/{username}")
+    public ResponseEntity<List<MatchFromUserDto>> getMatchesFromUser(@PathVariable String username, Pageable pageable) {
+        try {
+            return ResponseEntity.ok(this.userService.getMatchesFromUser(username, pageable));
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
 }

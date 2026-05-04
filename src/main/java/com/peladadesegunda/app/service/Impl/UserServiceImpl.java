@@ -1,11 +1,15 @@
 package com.peladadesegunda.app.service.Impl;
 
+import com.peladadesegunda.app.dto.MatchFromUserDto;
 import com.peladadesegunda.app.dto.PerformanceEvaluationDto;
 import com.peladadesegunda.app.dto.UserDto;
 import com.peladadesegunda.app.exception.UsernameAlreadyExistsException;
 import com.peladadesegunda.app.exception.UserNotFoundException;
+import com.peladadesegunda.app.mapper.AbstractMatchMapper;
 import com.peladadesegunda.app.mapper.AbstractUserMapper;
+import com.peladadesegunda.app.model.MatchPlayerEntity;
 import com.peladadesegunda.app.model.UserEntity;
+import com.peladadesegunda.app.repository.MatchPlayerRepository;
 import com.peladadesegunda.app.repository.UserRepository;
 import com.peladadesegunda.app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +25,13 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private MatchPlayerRepository matchPlayerRepository;
 
     @Autowired
     private AbstractUserMapper userMapper;
+    @Autowired
+    private AbstractMatchMapper matchMapper;
 
     @Override
     public List<UserDto> getAllUsers(Pageable pageable) {
@@ -95,4 +103,23 @@ public class UserServiceImpl implements UserService {
     public void evaluatePerformances(PerformanceEvaluationDto performanceEvaluationDto) {
 
     }
+
+
+    @Override
+    public List<MatchFromUserDto> getMatchesFromUser(String username, Pageable pageable) throws UserNotFoundException {
+        Optional<UserEntity> userEntityOptional = this.userRepository.findByUsername(username);
+
+        if (userEntityOptional.isEmpty()) {
+            throw new UserNotFoundException(username);
+        }
+
+        Page<MatchPlayerEntity> page = this.matchPlayerRepository.findAllByUser_IdOrderByMatch_MatchStartDateAsc(userEntityOptional.get().getId(), pageable);
+
+        if (page.isEmpty()) return new ArrayList<>();
+
+        return this.matchMapper.toMatchFromUserDtoList(page.stream().toList());
+    }
+
+    //todo get all mensalistas
+
 }
