@@ -72,7 +72,7 @@ public class MatchController {
         return response;
     }
 
-    @GetMapping("/{username}")
+    @GetMapping("/player/{username}")
     public ResponseEntity<List<MatchFromUserDto>> getMatchesFromUser(@PathVariable String username, Pageable pageable) {
         try {
             return ResponseEntity.ok(this.matchService.getMatchesFromUser(username, pageable));
