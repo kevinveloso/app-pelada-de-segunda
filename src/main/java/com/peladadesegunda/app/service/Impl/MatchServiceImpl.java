@@ -62,6 +62,22 @@ public class MatchServiceImpl implements MatchService {
     public MatchDto createMatch(AddUpdateMatchDto match) {
         MatchEntity matchEntity = this.matchMapper.toMatchEntity(match);
 
+        List<UserEntity> regularMembersList = this.userRepository.findByRegularMemberTrueOrderByNameAsc();
+
+        Set<MatchPlayerEntity> matchPlayerEntitySet = new HashSet<>();
+
+        regularMembersList.forEach(rm -> {
+            MatchPlayerEntity matchPlayerEntity = new MatchPlayerEntity();
+
+            matchPlayerEntity.setUser(rm);
+            matchPlayerEntity.setMatch(matchEntity);
+            matchPlayerEntity.setSubscriptionDate(new Date());
+
+            matchPlayerEntitySet.add(matchPlayerEntity);
+        });
+
+        matchEntity.setMatchPlayerSet(matchPlayerEntitySet);
+
         MatchEntity savedMatchEntity = this.matchRepository.save(matchEntity);
 
         return this.matchMapper.toMatchDto(savedMatchEntity);
