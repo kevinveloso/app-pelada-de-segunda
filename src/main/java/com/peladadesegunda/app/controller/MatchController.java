@@ -8,6 +8,7 @@ import com.peladadesegunda.app.exception.UserNotFoundException;
 import com.peladadesegunda.app.exception.UserNotInMatchException;
 import com.peladadesegunda.app.service.MatchService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,8 +23,8 @@ public class MatchController {
     public MatchService matchService;
 
     @GetMapping
-    public ResponseEntity<List<MatchDto>> getAllMatches() {
-        return ResponseEntity.ok(this.matchService.getAllMatches());
+    public ResponseEntity<List<MatchDto>> getAllMatches(Pageable pageable) {
+        return ResponseEntity.ok(this.matchService.getAllMatches(pageable));
     }
 
     @GetMapping("/{id}")

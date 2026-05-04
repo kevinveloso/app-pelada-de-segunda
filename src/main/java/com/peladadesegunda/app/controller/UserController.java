@@ -6,6 +6,7 @@ import com.peladadesegunda.app.exception.UsernameAlreadyExistsException;
 import com.peladadesegunda.app.exception.UserNotFoundException;
 import com.peladadesegunda.app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,8 +21,8 @@ public class UserController {
     private UserService userService;
 
     @GetMapping
-    public ResponseEntity<List<UserDto>> getAllUsers() {
-        return ResponseEntity.ok(this.userService.getAllUsers());
+    public ResponseEntity<List<UserDto>> getAllUsers(Pageable pageable) {
+        return ResponseEntity.ok(this.userService.getAllUsers(pageable));
     }
 
     @GetMapping("/{id}")

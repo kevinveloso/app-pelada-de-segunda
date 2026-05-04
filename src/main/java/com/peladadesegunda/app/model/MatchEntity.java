@@ -20,8 +20,11 @@ public class MatchEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "match_date", nullable = false)
-    private Date matchDate;
+    @Column(name = "match_start_date", nullable = false)
+    private Date matchStartDate;
+
+    @Column(name = "match_end_date", nullable = false)
+    private Date matchEndDate;
 
     @Column(name = "max_players", nullable = false)
     private Integer maxPlayers;

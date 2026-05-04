@@ -10,6 +10,8 @@ import com.peladadesegunda.app.repository.UserRepository;
 import com.peladadesegunda.app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -24,14 +26,14 @@ public class UserServiceImpl implements UserService {
     private AbstractUserMapper userMapper;
 
     @Override
-    public List<UserDto> getAllUsers() {
-        List<UserEntity> userEntityList = this.userRepository.findAll();
+    public List<UserDto> getAllUsers(Pageable pageable) {
+        Page<UserEntity> userEntityList = this.userRepository.findAll(pageable);
 
         if (userEntityList.isEmpty()) {
             return new ArrayList<>();
         }
 
-        return this.userMapper.toUserDtoList(userEntityList);
+        return this.userMapper.toUserDtoList(userEntityList.stream().toList());
     }
 
     @Override

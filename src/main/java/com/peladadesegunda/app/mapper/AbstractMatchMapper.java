@@ -3,6 +3,7 @@ package com.peladadesegunda.app.mapper;
 import com.peladadesegunda.app.dto.AddUpdateMatchDto;
 import com.peladadesegunda.app.dto.MatchDto;
 import com.peladadesegunda.app.dto.UserDto;
+import com.peladadesegunda.app.enumeration.MatchStatus;
 import com.peladadesegunda.app.model.MatchEntity;
 import com.peladadesegunda.app.model.MatchPlayerEntity;
 import org.mapstruct.Mapper;
@@ -21,6 +22,7 @@ public abstract class AbstractMatchMapper {
     public abstract List<MatchDto> toMatchDtoList(List<MatchEntity> matchEntityList);
 
     @Mappings({
+            @Mapping(target = "matchStatus", expression = "java(this.getMatchStatus(matchEntity))"),
             @Mapping(target = "subscribedPlayerList", expression = "java(this.getSubscribedPlayersList(matchEntity))"),
             @Mapping(target = "waitingList", expression = "java(this.getWaitingList(matchEntity))")
     })
@@ -29,6 +31,18 @@ public abstract class AbstractMatchMapper {
     public abstract MatchEntity toMatchEntity(AddUpdateMatchDto addUpdateMatchDto);
 
     public abstract MatchEntity toMatchEntity(MatchDto matchDto);
+
+    protected MatchStatus getMatchStatus(MatchEntity matchEntity) {
+        Date now = new Date();
+
+        if (now.before(matchEntity.getMatchStartDate())) {
+            return MatchStatus.SCHEDULED;
+        } else if (now.after(matchEntity.getMatchEndDate())) {
+            return MatchStatus.FINISHED;
+        }
+
+        return MatchStatus.ONGOING;
+    }
 
     protected List<UserDto> getSubscribedPlayersList(MatchEntity matchEntity) {
         final List<MatchPlayerEntity> matchPlayerEntityList = toMatchPlayerEntityList(matchEntity);

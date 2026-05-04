@@ -16,6 +16,8 @@ import com.peladadesegunda.app.repository.UserRepository;
 import com.peladadesegunda.app.service.MatchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,14 +37,14 @@ public class MatchServiceImpl implements MatchService {
     private UserRepository userRepository;
 
     @Override
-    public List<MatchDto> getAllMatches() {
-        List<MatchEntity> matchEntityList = this.matchRepository.findAll();
+    public List<MatchDto> getAllMatches(Pageable pageable) {
+        Page<MatchEntity> matchEntityList = this.matchRepository.findAll(pageable);
 
         if (matchEntityList.isEmpty()) {
             return new ArrayList<>();
         }
 
-        return this.matchMapper.toMatchDtoList(matchEntityList);
+        return this.matchMapper.toMatchDtoList(matchEntityList.stream().toList());
     }
 
     @Override
@@ -73,7 +75,9 @@ public class MatchServiceImpl implements MatchService {
 
         if (matchEntityOptional.isEmpty()) throw new MatchNotFoundException(String.valueOf(match.getId()));
 
-        if (Objects.nonNull(match.getMatchDate())) matchEntityOptional.get().setMatchDate(match.getMatchDate());
+        if (Objects.nonNull(match.getMatchStartDate())) matchEntityOptional.get().setMatchStartDate(match.getMatchStartDate());
+
+        if (Objects.nonNull(match.getMatchEndDate())) matchEntityOptional.get().setMatchStartDate(match.getMatchEndDate());
 
         if (Objects.nonNull(match.getMaxPlayers())) matchEntityOptional.get().setMaxPlayers(match.getMaxPlayers());
 
