@@ -9,8 +9,8 @@ import java.util.List;
 public class TeamsDto {
 
     private Long matchId;
-    private List<UserDto> teamA;
-    private List<UserDto> teamB;
+    private List<PlayerDto> teamA;
+    private List<PlayerDto> teamB;
 
     public TeamsDto() {
         this.teamA = new ArrayList<>();

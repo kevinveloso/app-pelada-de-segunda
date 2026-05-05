@@ -1,15 +1,10 @@
 package com.peladadesegunda.app.service.Impl;
 
-import com.peladadesegunda.app.dto.MatchFromUserDto;
-import com.peladadesegunda.app.dto.PerformanceEvaluationDto;
 import com.peladadesegunda.app.dto.UserDto;
-import com.peladadesegunda.app.exception.UsernameAlreadyExistsException;
 import com.peladadesegunda.app.exception.UserNotFoundException;
-import com.peladadesegunda.app.mapper.AbstractMatchMapper;
+import com.peladadesegunda.app.exception.UsernameAlreadyExistsException;
 import com.peladadesegunda.app.mapper.AbstractUserMapper;
-import com.peladadesegunda.app.model.MatchPlayerEntity;
 import com.peladadesegunda.app.model.UserEntity;
-import com.peladadesegunda.app.repository.MatchPlayerRepository;
 import com.peladadesegunda.app.repository.UserRepository;
 import com.peladadesegunda.app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,20 +13,19 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
-    @Autowired
-    private MatchPlayerRepository matchPlayerRepository;
 
     @Autowired
     private AbstractUserMapper userMapper;
-    @Autowired
-    private AbstractMatchMapper matchMapper;
 
     @Override
     public List<UserDto> getAllUsers(Pageable pageable) {
@@ -79,11 +73,6 @@ public class UserServiceImpl implements UserService {
 
         if (Objects.nonNull(user.getUsername())) userEntity.setUsername(user.getUsername());
         if (Objects.nonNull(user.getPassword())) userEntity.setPassword(user.getPassword());
-        if (Objects.nonNull(user.getName())) userEntity.setName(user.getName());
-        if (Objects.nonNull(user.getNickname())) userEntity.setNickname(user.getNickname());
-        if (Objects.nonNull(user.getBirthdate())) userEntity.setBirthdate(user.getBirthdate());
-        if (!user.getPositionList().isEmpty()) userEntity.setPositionSet(new HashSet<>(user.getPositionList()));
-        if (Objects.nonNull(user.getRegularMember())) userEntity.setRegularMember(user.getRegularMember());
 
         try {
             UserEntity updatedUserEntity = this.userRepository.save(userEntity);
@@ -97,21 +86,5 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(Long id) {
         this.userRepository.deleteById(id);
-    }
-
-    @Override
-    public void evaluatePerformances(PerformanceEvaluationDto performanceEvaluationDto) {
-
-    }
-
-    @Override
-    public List<UserDto> getAllRegularMembers() {
-        List<UserEntity> userEntityList = this.userRepository.findByRegularMemberTrueOrderByNameAsc();
-
-        if (userEntityList.isEmpty()) {
-            return new ArrayList<>();
-        }
-
-        return this.userMapper.toUserDtoList(userEntityList.stream().toList());
     }
 }

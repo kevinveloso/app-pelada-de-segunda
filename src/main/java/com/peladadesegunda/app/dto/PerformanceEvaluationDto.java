@@ -7,6 +7,6 @@ import java.util.List;
 @Data
 public class PerformanceEvaluationDto {
     private MatchDto matchDto;
-    private UserDto evaluator;
-    private List<UserDto> evaluateeList;
+    private PlayerDto evaluator;
+    private List<PlayerDto> evaluateeList;
 }

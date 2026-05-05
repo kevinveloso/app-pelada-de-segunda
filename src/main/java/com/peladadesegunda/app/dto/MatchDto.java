@@ -13,6 +13,6 @@ public class MatchDto {
     private Date matchEndDate;
     private Integer maxPlayers;
     private MatchStatus matchStatus;
-    private List<UserDto> subscribedPlayerList;
-    private List<UserDto> waitingList;
+    private List<PlayerDto> subscribedPlayerList;
+    private List<PlayerDto> waitingList;
 }

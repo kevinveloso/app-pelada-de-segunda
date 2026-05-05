@@ -10,9 +10,7 @@ import java.util.Optional;
 
 public interface MatchPlayerRepository  extends JpaRepository<MatchPlayerEntity, Long> {
 
-    Optional<MatchPlayerEntity> findByUser_UsernameAndMatch_Id(String userUsername, Long matchId);
+    Optional<MatchPlayerEntity> findByPlayer_IdAndMatch_Id(Long playerId, Long matchId);
 
-    Page<MatchPlayerEntity> findAllByUser_IdOrderByMatch_MatchStartDateAsc(Long id, Pageable pageable);
-
-    List<MatchPlayerEntity> findByMatch_IdOrderBySubscriptionDateAsc(Long matchId);
+    Page<MatchPlayerEntity> findAllByPlayer_IdOrderByMatch_MatchStartDateAsc(Long id, Pageable pageable);
 }

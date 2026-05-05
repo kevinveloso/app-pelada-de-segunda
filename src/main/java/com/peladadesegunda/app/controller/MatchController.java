@@ -69,7 +69,7 @@ public class MatchController {
     }
 
     @GetMapping("/player/{username}")
-    public ResponseEntity<List<MatchFromUserDto>> getMatchesFromUser(@PathVariable String username, Pageable pageable) {
+    public ResponseEntity<List<MatchFromPlayerDto>> getMatchesFromUser(@PathVariable String username, Pageable pageable) {
         try {
             return ResponseEntity.ok(this.matchService.getMatchesFromUser(username, pageable));
         } catch (UserNotFoundException e) {
@@ -82,7 +82,7 @@ public class MatchController {
         try {
             this.matchService.removePlayerFromMatch(matchId, playerUsername);
             return ResponseEntity.noContent().build();
-        } catch (MatchNotFoundException | UserNotInMatchException e) {
+        } catch (MatchNotFoundException | UserNotFoundException | PlayerNotInMatchException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
@@ -100,5 +100,14 @@ public class MatchController {
         }
 
         return response;
+    }
+
+    @GetMapping("/result/{id}")
+    public ResponseEntity<MatchResultDto> getMatchResult(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(this.matchService.getMatchResult(id));
+        } catch (MatchNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 }

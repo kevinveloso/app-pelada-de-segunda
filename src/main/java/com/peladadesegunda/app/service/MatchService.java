@@ -20,9 +20,11 @@ public interface MatchService {
 
     MatchDto addPlayerToMatch(Long matchId, String playerUsername) throws UserNotFoundException, MatchNotFoundException, PlayerAlreadyInMatchException;
 
-    List<MatchFromUserDto> getMatchesFromUser(String username, Pageable pageable) throws UserNotFoundException;
+    List<MatchFromPlayerDto> getMatchesFromUser(String username, Pageable pageable) throws UserNotFoundException;
 
-    void removePlayerFromMatch(Long matchId, String playerUsername) throws MatchNotFoundException, UserNotInMatchException;
+    void removePlayerFromMatch(Long matchId, String playerUsername) throws MatchNotFoundException, PlayerNotInMatchException, UserNotFoundException;
 
     TeamsDto drawTeams(DrawTeamsDto drawTeamsDto) throws MatchNotFoundException, MatchIsOverException;
+
+    MatchResultDto getMatchResult(Long matchId) throws MatchNotFoundException;
 }
