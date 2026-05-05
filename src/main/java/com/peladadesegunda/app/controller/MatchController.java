@@ -1,12 +1,7 @@
 package com.peladadesegunda.app.controller;
 
-import com.peladadesegunda.app.dto.AddUpdateMatchDto;
-import com.peladadesegunda.app.dto.MatchDto;
-import com.peladadesegunda.app.dto.MatchFromUserDto;
-import com.peladadesegunda.app.exception.MatchNotFoundException;
-import com.peladadesegunda.app.exception.PlayerAlreadyInMatchException;
-import com.peladadesegunda.app.exception.UserNotFoundException;
-import com.peladadesegunda.app.exception.UserNotInMatchException;
+import com.peladadesegunda.app.dto.*;
+import com.peladadesegunda.app.exception.*;
 import com.peladadesegunda.app.service.MatchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -69,6 +64,7 @@ public class MatchController {
         } catch (PlayerAlreadyInMatchException e) {
             response = ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
+
         return response;
     }
 
@@ -89,5 +85,20 @@ public class MatchController {
         } catch (MatchNotFoundException | UserNotInMatchException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
+    }
+
+    @PostMapping("/draw")
+    public ResponseEntity<TeamsDto> drawTeams(@RequestBody DrawTeamsDto drawTeamsDto) {
+        ResponseEntity<TeamsDto> response = null;
+
+        try {
+            response = ResponseEntity.ok(this.matchService.drawTeams(drawTeamsDto));
+        } catch (MatchNotFoundException e) {
+            response = ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (MatchIsOverException e) {
+            response = ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        return response;
     }
 }

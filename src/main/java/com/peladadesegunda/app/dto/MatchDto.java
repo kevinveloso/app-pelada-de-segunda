@@ -8,11 +8,11 @@ import java.util.List;
 
 @Data
 public class MatchDto {
-    public Long id;
-    public Date matchStartDate;
-    public Date matchEndDate;
-    public Integer maxPlayers;
-    public MatchStatus matchStatus;
-    public List<UserDto> subscribedPlayerList;
-    public List<UserDto> waitingList;
+    private Long id;
+    private Date matchStartDate;
+    private Date matchEndDate;
+    private Integer maxPlayers;
+    private MatchStatus matchStatus;
+    private List<UserDto> subscribedPlayerList;
+    private List<UserDto> waitingList;
 }

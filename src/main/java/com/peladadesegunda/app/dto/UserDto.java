@@ -10,15 +10,15 @@ import java.util.List;
 @Data
 public class UserDto {
 
-    public Long id;
-    public String username;
+    private Long id;
+    private String username;
     private String password;
-    public String name;
-    public String nickname;
-    public Date birthdate;
-    public List<Position> positionList;
-    public UserRole role;
-    public Double gradeAverage;
-    public Boolean regularMember;
-    public Double lastMatchGrade;
+    private String name;
+    private String nickname;
+    private Date birthdate;
+    private List<Position> positionList;
+    private UserRole role;
+    private Double gradeAverage;
+    private Boolean regularMember;
+    private Double lastMatchGrade;
 }

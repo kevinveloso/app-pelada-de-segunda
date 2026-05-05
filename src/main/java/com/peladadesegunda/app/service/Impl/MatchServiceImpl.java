@@ -1,13 +1,9 @@
 package com.peladadesegunda.app.service.Impl;
 
-import com.peladadesegunda.app.dto.AddUpdateMatchDto;
-import com.peladadesegunda.app.dto.MatchDto;
-import com.peladadesegunda.app.dto.MatchFromUserDto;
-import com.peladadesegunda.app.exception.MatchNotFoundException;
-import com.peladadesegunda.app.exception.PlayerAlreadyInMatchException;
-import com.peladadesegunda.app.exception.UserNotFoundException;
-import com.peladadesegunda.app.exception.UserNotInMatchException;
+import com.peladadesegunda.app.dto.*;
+import com.peladadesegunda.app.exception.*;
 import com.peladadesegunda.app.mapper.AbstractMatchMapper;
+import com.peladadesegunda.app.mapper.AbstractUserMapper;
 import com.peladadesegunda.app.model.MatchEntity;
 import com.peladadesegunda.app.model.MatchPlayerEntity;
 import com.peladadesegunda.app.model.UserEntity;
@@ -29,6 +25,8 @@ public class MatchServiceImpl implements MatchService {
 
     @Autowired
     private AbstractMatchMapper matchMapper;
+    @Autowired
+    private AbstractUserMapper userMapper;
 
     @Autowired
     private MatchRepository matchRepository;
@@ -94,7 +92,7 @@ public class MatchServiceImpl implements MatchService {
 
         if (Objects.nonNull(match.getMatchStartDate())) matchEntityOptional.get().setMatchStartDate(match.getMatchStartDate());
 
-        if (Objects.nonNull(match.getMatchEndDate())) matchEntityOptional.get().setMatchStartDate(match.getMatchEndDate());
+        if (Objects.nonNull(match.getMatchEndDate())) matchEntityOptional.get().setMatchEndDate(match.getMatchEndDate());
 
         if (Objects.nonNull(match.getMaxPlayers())) matchEntityOptional.get().setMaxPlayers(match.getMaxPlayers());
 
@@ -165,5 +163,73 @@ public class MatchServiceImpl implements MatchService {
 
         this.matchPlayerRepository.delete(matchPlayer);
         this.matchPlayerRepository.flush();
+    }
+
+    @Override
+    public TeamsDto drawTeams(DrawTeamsDto drawTeamsDto) throws MatchNotFoundException, MatchIsOverException {
+        Objects.requireNonNull(drawTeamsDto.getMatchId(), "Match ID can't be null!");
+
+        Optional<MatchEntity> matchEntityOptional = this.matchRepository.findById(drawTeamsDto.getMatchId());
+
+        if (matchEntityOptional.isEmpty()) throw new MatchNotFoundException(String.valueOf(drawTeamsDto.getMatchId()));
+
+        Date now = new Date();
+        if (now.after(matchEntityOptional.get().getMatchEndDate())) {
+            throw new MatchIsOverException(String.valueOf(drawTeamsDto.getMatchId()));
+        }
+
+        TeamsDto resultTeamsDto = new TeamsDto();
+        resultTeamsDto.setMatchId(drawTeamsDto.getMatchId());
+
+        List<MatchPlayerEntity> matchPlayerEntityList = null;
+
+        switch (drawTeamsDto.getDrawStyle()) {
+            case BALANCED -> { matchPlayerEntityList = this.balancedDraw(matchEntityOptional.get()); }
+            case POSITION_BALANCED -> { matchPlayerEntityList = this.positionBalancedDraw(matchEntityOptional.get()); }
+            default -> { matchPlayerEntityList = this.blindDraw(matchEntityOptional.get()); }
+        }
+
+        matchPlayerEntityList.forEach(m -> {
+            if (m.getTeam() == 0) {
+                resultTeamsDto.getTeamA().add(this.userMapper.toUserDto(m.getUser()));
+            } else if (m.getTeam() == 1) {
+                resultTeamsDto.getTeamB().add(this.userMapper.toUserDto(m.getUser()));
+            }
+        });
+
+        return resultTeamsDto;
+    }
+
+    private List<MatchPlayerEntity> balancedDraw(MatchEntity match) {
+        return new ArrayList<>();
+    }
+
+    private List<MatchPlayerEntity> positionBalancedDraw(MatchEntity match) {
+        return new ArrayList<>();
+    }
+
+    private List<MatchPlayerEntity> blindDraw(MatchEntity match) {
+        List<MatchPlayerEntity> listOfSubscribedPlayers = new ArrayList<>(match.getMatchPlayerSet());
+
+        listOfSubscribedPlayers.sort(Comparator.comparing(MatchPlayerEntity::getSubscriptionDate));
+
+        if (listOfSubscribedPlayers.size() > match.getMaxPlayers()) {
+            listOfSubscribedPlayers = listOfSubscribedPlayers.subList(match.getMaxPlayers(), listOfSubscribedPlayers.size());
+        }
+
+        Collections.shuffle(listOfSubscribedPlayers);
+
+        for (int i = 0; i < listOfSubscribedPlayers.size(); i++) {
+
+            if (i < (listOfSubscribedPlayers.size()/2)) {
+                listOfSubscribedPlayers.get(i).setTeam(0);
+            } else {
+                listOfSubscribedPlayers.get(i).setTeam(1);
+            }
+
+            this.matchPlayerRepository.save(listOfSubscribedPlayers.get(i));
+        }
+
+        return listOfSubscribedPlayers;
     }
 }

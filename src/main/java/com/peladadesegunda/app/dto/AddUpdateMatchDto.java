@@ -6,8 +6,8 @@ import java.util.Date;
 
 @Data
 public class AddUpdateMatchDto {
-    public Long id;
-    public Date matchStartDate;
-    public Date matchEndDate;
-    public Integer maxPlayers;
+    private Long id;
+    private Date matchStartDate;
+    private Date matchEndDate;
+    private Integer maxPlayers;
 }

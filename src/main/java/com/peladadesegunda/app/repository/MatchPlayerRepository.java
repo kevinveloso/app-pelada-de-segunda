@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface MatchPlayerRepository  extends JpaRepository<MatchPlayerEntity, Long> {
@@ -12,4 +13,6 @@ public interface MatchPlayerRepository  extends JpaRepository<MatchPlayerEntity,
     Optional<MatchPlayerEntity> findByUser_UsernameAndMatch_Id(String userUsername, Long matchId);
 
     Page<MatchPlayerEntity> findAllByUser_IdOrderByMatch_MatchStartDateAsc(Long id, Pageable pageable);
+
+    List<MatchPlayerEntity> findByMatch_IdOrderBySubscriptionDateAsc(Long matchId);
 }

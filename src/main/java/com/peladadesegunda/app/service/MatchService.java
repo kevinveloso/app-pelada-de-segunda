@@ -1,12 +1,7 @@
 package com.peladadesegunda.app.service;
 
-import com.peladadesegunda.app.dto.AddUpdateMatchDto;
-import com.peladadesegunda.app.dto.MatchDto;
-import com.peladadesegunda.app.dto.MatchFromUserDto;
-import com.peladadesegunda.app.exception.MatchNotFoundException;
-import com.peladadesegunda.app.exception.PlayerAlreadyInMatchException;
-import com.peladadesegunda.app.exception.UserNotFoundException;
-import com.peladadesegunda.app.exception.UserNotInMatchException;
+import com.peladadesegunda.app.dto.*;
+import com.peladadesegunda.app.exception.*;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -28,4 +23,6 @@ public interface MatchService {
     List<MatchFromUserDto> getMatchesFromUser(String username, Pageable pageable) throws UserNotFoundException;
 
     void removePlayerFromMatch(Long matchId, String playerUsername) throws MatchNotFoundException, UserNotInMatchException;
+
+    TeamsDto drawTeams(DrawTeamsDto drawTeamsDto) throws MatchNotFoundException, MatchIsOverException;
 }
