@@ -110,19 +110,19 @@ public class MatchServiceImpl implements MatchService {
     }
 
     @Override
-    public MatchDto addPlayerToMatch(Long matchId, String playerUsername) throws UserNotFoundException,
+    public MatchDto addPlayerToMatch(Long matchId, Long playerId) throws PlayerNotFoundException,
             MatchNotFoundException, PlayerAlreadyInMatchException {
-        Objects.requireNonNull(playerUsername, "Player username can't be null!");
+        Objects.requireNonNull(playerId, "Player ID can't be null!");
         Objects.requireNonNull(matchId, "Match ID can't be null!");
 
-        Optional<UserEntity> userEntityOptional = this.userRepository.findByUsername(playerUsername);
+        Optional<PlayerEntity> playerEntityOptional = this.playerRepository.findById(playerId);
         Optional<MatchEntity> matchEntityOptional = this.matchRepository.findById(matchId);
 
-        if (userEntityOptional.isEmpty()) throw new UserNotFoundException(playerUsername);
+        if (playerEntityOptional.isEmpty()) throw new PlayerNotFoundException(String.valueOf(playerId));
         if (matchEntityOptional.isEmpty()) throw new MatchNotFoundException(String.valueOf(matchId));
 
         final MatchPlayerEntity matchPlayerEntity = new MatchPlayerEntity();
-        matchPlayerEntity.setPlayer(userEntityOptional.get().getPlayer());
+        matchPlayerEntity.setPlayer(playerEntityOptional.get());
         matchPlayerEntity.setMatch(matchEntityOptional.get());
         matchPlayerEntity.setSubscriptionDate(new Date());
 
@@ -131,7 +131,7 @@ public class MatchServiceImpl implements MatchService {
 
             return this.matchMapper.toMatchDto(savedMatchPlayerEntity.getMatch());
         } catch (DataIntegrityViolationException e) {
-            throw new PlayerAlreadyInMatchException(playerUsername);
+            throw new PlayerAlreadyInMatchException(String.valueOf(playerId));
         }
     }
 
@@ -153,20 +153,20 @@ public class MatchServiceImpl implements MatchService {
 
     @Override
     @Transactional
-    public void removePlayerFromMatch(Long matchId, String playerUsername) throws MatchNotFoundException,
-            PlayerNotInMatchException, UserNotFoundException {
-        Objects.requireNonNull(playerUsername, "Player username can't be null!");
+    public void removePlayerFromMatch(Long matchId, Long playerId) throws MatchNotFoundException,
+            PlayerNotInMatchException, PlayerNotFoundException {
+        Objects.requireNonNull(playerId, "Player ID can't be null!");
         Objects.requireNonNull(matchId, "Match ID can't be null!");
 
         this.matchRepository.findById(matchId)
                 .orElseThrow(() -> new MatchNotFoundException(String.valueOf(matchId)));
 
-        UserEntity userEntity = this.userRepository.findByUsername(playerUsername)
-                .orElseThrow(() -> new UserNotFoundException(playerUsername));
+        PlayerEntity playerEntity = this.playerRepository.findById(playerId)
+                .orElseThrow(() -> new PlayerNotFoundException(String.valueOf(playerId)));
 
         MatchPlayerEntity matchPlayer = this.matchPlayerRepository
-                .findByPlayer_IdAndMatch_Id(userEntity.getPlayer().getId(), matchId)
-                .orElseThrow(() -> new PlayerNotInMatchException(playerUsername));
+                .findByPlayer_IdAndMatch_Id(playerEntity.getId(), matchId)
+                .orElseThrow(() -> new PlayerNotInMatchException(String.valueOf(playerId)));
 
         this.matchPlayerRepository.delete(matchPlayer);
         this.matchPlayerRepository.flush();
