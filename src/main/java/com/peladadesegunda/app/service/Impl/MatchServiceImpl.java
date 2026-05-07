@@ -136,15 +136,15 @@ public class MatchServiceImpl implements MatchService {
     }
 
     @Override
-    public List<MatchFromPlayerDto> getMatchesFromUser(String username, Pageable pageable) throws UserNotFoundException {
-        Optional<UserEntity> userEntityOptional = this.userRepository.findByUsername(username);
+    public List<MatchFromPlayerDto> getMatchesFromPlayer(Long playerId, Pageable pageable) throws PlayerNotFoundException {
+        Optional<PlayerEntity> playerEntityOptional = this.playerRepository.findById(playerId);
 
-        if (userEntityOptional.isEmpty()) {
-            throw new UserNotFoundException(username);
+        if (playerEntityOptional.isEmpty()) {
+            throw new PlayerNotFoundException(String.valueOf(playerId));
         }
 
         Page<MatchPlayerEntity> page = this.matchPlayerRepository
-                .findAllByPlayer_IdOrderByMatch_MatchStartDateAsc(userEntityOptional.get().getPlayer().getId(), pageable);
+                .findAllByPlayer_IdOrderByMatch_MatchStartDateAsc(playerEntityOptional.get().getId(), pageable);
 
         if (page.isEmpty()) return new ArrayList<>();
 

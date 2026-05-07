@@ -21,7 +21,7 @@ public interface MatchService {
     MatchDto addPlayerToMatch(Long matchId, Long playerId) throws PlayerNotFoundException,
             MatchNotFoundException, PlayerAlreadyInMatchException;
 
-    List<MatchFromPlayerDto> getMatchesFromUser(String username, Pageable pageable) throws UserNotFoundException;
+    List<MatchFromPlayerDto> getMatchesFromPlayer(Long playerId, Pageable pageable) throws PlayerNotFoundException;
 
     void removePlayerFromMatch(Long matchId, Long playerId) throws MatchNotFoundException,
             PlayerNotInMatchException, PlayerNotFoundException;

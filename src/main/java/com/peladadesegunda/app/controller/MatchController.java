@@ -68,11 +68,11 @@ public class MatchController {
         return response;
     }
 
-    @GetMapping("/player/{username}")
-    public ResponseEntity<List<MatchFromPlayerDto>> getMatchesFromUser(@PathVariable String username, Pageable pageable) {
+    @GetMapping("/player/{playerId}")
+    public ResponseEntity<List<MatchFromPlayerDto>> getMatchesFromPlayer(@PathVariable Long playerId, Pageable pageable) {
         try {
-            return ResponseEntity.ok(this.matchService.getMatchesFromUser(username, pageable));
-        } catch (UserNotFoundException e) {
+            return ResponseEntity.ok(this.matchService.getMatchesFromPlayer(playerId, pageable));
+        } catch (PlayerNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
