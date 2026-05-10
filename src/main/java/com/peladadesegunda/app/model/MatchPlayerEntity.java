@@ -1,7 +1,6 @@
 package com.peladadesegunda.app.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,8 +17,8 @@ public class MatchPlayerEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "id_user", nullable = false)
-    private UserEntity user;
+    @JoinColumn(name = "id_player", nullable = false)
+    private PlayerEntity player;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "id_match", nullable = false)

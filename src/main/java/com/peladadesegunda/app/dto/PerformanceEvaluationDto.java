@@ -8,5 +8,5 @@ import java.util.List;
 public class PerformanceEvaluationDto {
     private MatchDto matchDto;
     private UserDto evaluator;
-    private List<UserDto> evaluateeList;
+    private List<PlayerDto> evaluateeList;
 }

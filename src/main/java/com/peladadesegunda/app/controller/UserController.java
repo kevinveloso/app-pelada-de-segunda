@@ -1,7 +1,5 @@
 package com.peladadesegunda.app.controller;
 
-import com.peladadesegunda.app.dto.MatchFromUserDto;
-import com.peladadesegunda.app.dto.PerformanceEvaluationDto;
 import com.peladadesegunda.app.dto.UserDto;
 import com.peladadesegunda.app.exception.UsernameAlreadyExistsException;
 import com.peladadesegunda.app.exception.UserNotFoundException;
@@ -15,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/player")
+@RequestMapping("/user")
 public class UserController {
 
     @Autowired
@@ -63,16 +61,4 @@ public class UserController {
         this.userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
-
-    @PostMapping("/evaluation")
-    public ResponseEntity<Void> evaluatePerformances(@PathVariable PerformanceEvaluationDto performanceEvaluationDto) {
-        this.userService.evaluatePerformances(performanceEvaluationDto);
-        return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/regular-members")
-    public ResponseEntity<List<UserDto>> getAllRegularMembers() {
-        return ResponseEntity.ok(this.userService.getAllRegularMembers());
-    }
-
 }

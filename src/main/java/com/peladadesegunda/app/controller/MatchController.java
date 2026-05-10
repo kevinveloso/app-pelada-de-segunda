@@ -53,13 +53,13 @@ public class MatchController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/{matchId}/add-player/{playerUsername}")
-    public ResponseEntity<MatchDto> addPlayerToMatch(@PathVariable Long matchId, @PathVariable String playerUsername) {
+    @PostMapping("/{matchId}/add-player/{playerId}")
+    public ResponseEntity<MatchDto> addPlayerToMatch(@PathVariable Long matchId, @PathVariable Long playerId) {
         ResponseEntity<MatchDto> response = null;
 
         try {
-            response = ResponseEntity.ok(this.matchService.addPlayerToMatch(matchId, playerUsername));
-        } catch (MatchNotFoundException | UserNotFoundException e) {
+            response = ResponseEntity.ok(this.matchService.addPlayerToMatch(matchId, playerId));
+        } catch (MatchNotFoundException | PlayerNotFoundException e) {
             response = ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (PlayerAlreadyInMatchException e) {
             response = ResponseEntity.status(HttpStatus.FORBIDDEN).build();
@@ -68,21 +68,21 @@ public class MatchController {
         return response;
     }
 
-    @GetMapping("/player/{username}")
-    public ResponseEntity<List<MatchFromUserDto>> getMatchesFromUser(@PathVariable String username, Pageable pageable) {
+    @GetMapping("/player/{playerId}")
+    public ResponseEntity<List<MatchFromPlayerDto>> getMatchesFromPlayer(@PathVariable Long playerId, Pageable pageable) {
         try {
-            return ResponseEntity.ok(this.matchService.getMatchesFromUser(username, pageable));
-        } catch (UserNotFoundException e) {
+            return ResponseEntity.ok(this.matchService.getMatchesFromPlayer(playerId, pageable));
+        } catch (PlayerNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
-    @DeleteMapping("/{matchId}/remove-player/{playerUsername}")
-    public ResponseEntity<MatchDto> removePlayerFromMatch(@PathVariable Long matchId, @PathVariable String playerUsername) {
+    @DeleteMapping("/{matchId}/remove-player/{playerId}")
+    public ResponseEntity<MatchDto> removePlayerFromMatch(@PathVariable Long matchId, @PathVariable Long playerId) {
         try {
-            this.matchService.removePlayerFromMatch(matchId, playerUsername);
+            this.matchService.removePlayerFromMatch(matchId, playerId);
             return ResponseEntity.noContent().build();
-        } catch (MatchNotFoundException | UserNotInMatchException e) {
+        } catch (MatchNotFoundException | PlayerNotFoundException | PlayerNotInMatchException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
@@ -100,5 +100,14 @@ public class MatchController {
         }
 
         return response;
+    }
+
+    @GetMapping("/result/{id}")
+    public ResponseEntity<MatchResultDto> getMatchResult(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(this.matchService.getMatchResult(id));
+        } catch (MatchNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 }

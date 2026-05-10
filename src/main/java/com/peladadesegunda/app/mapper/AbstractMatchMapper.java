@@ -1,9 +1,6 @@
 package com.peladadesegunda.app.mapper;
 
-import com.peladadesegunda.app.dto.AddUpdateMatchDto;
-import com.peladadesegunda.app.dto.MatchDto;
-import com.peladadesegunda.app.dto.MatchFromUserDto;
-import com.peladadesegunda.app.dto.UserDto;
+import com.peladadesegunda.app.dto.*;
 import com.peladadesegunda.app.enumeration.MatchStatus;
 import com.peladadesegunda.app.model.MatchEntity;
 import com.peladadesegunda.app.model.MatchPlayerEntity;
@@ -12,13 +9,16 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
 
 @Mapper(componentModel = "spring")
 public abstract class AbstractMatchMapper {
 
     @Autowired
-    protected AbstractUserMapper abstractUserMapper;
+    protected AbstractPlayerMapper abstractPlayerMapper;
 
     public abstract List<MatchDto> toMatchDtoList(List<MatchEntity> matchEntityList);
 
@@ -45,24 +45,24 @@ public abstract class AbstractMatchMapper {
         return MatchStatus.ONGOING;
     }
 
-    protected List<UserDto> getSubscribedPlayersList(MatchEntity matchEntity) {
+    protected List<PlayerDto> getSubscribedPlayersList(MatchEntity matchEntity) {
         final List<MatchPlayerEntity> matchPlayerEntityList = toMatchPlayerEntityList(matchEntity);
 
 
         if (matchPlayerEntityList.size() > matchEntity.getMaxPlayers()) {
-            return this.abstractUserMapper.toUserDtoList(matchPlayerEntityList
-                    .subList(0, matchEntity.getMaxPlayers()).stream().map(MatchPlayerEntity::getUser).toList());
+            return this.abstractPlayerMapper.toPlayerDtoList(matchPlayerEntityList
+                    .subList(0, matchEntity.getMaxPlayers()).stream().map(MatchPlayerEntity::getPlayer).toList());
         }
 
-        return this.abstractUserMapper.toUserDtoList(matchPlayerEntityList.stream().map(MatchPlayerEntity::getUser).toList());
+        return this.abstractPlayerMapper.toPlayerDtoList(matchPlayerEntityList.stream().map(MatchPlayerEntity::getPlayer).toList());
     }
 
-    protected List<UserDto> getWaitingList(MatchEntity matchEntity) {
+    protected List<PlayerDto> getWaitingList(MatchEntity matchEntity) {
         final List<MatchPlayerEntity> matchPlayerEntityList = toMatchPlayerEntityList(matchEntity);
 
         if (matchPlayerEntityList.size() > matchEntity.getMaxPlayers()) {
-            return this.abstractUserMapper.toUserDtoList(matchPlayerEntityList
-                    .subList(matchEntity.getMaxPlayers(), matchPlayerEntityList.size()).stream().map(MatchPlayerEntity::getUser).toList());
+            return this.abstractPlayerMapper.toPlayerDtoList(matchPlayerEntityList
+                    .subList(matchEntity.getMaxPlayers(), matchPlayerEntityList.size()).stream().map(MatchPlayerEntity::getPlayer).toList());
         }
 
         return new ArrayList<>();
@@ -78,6 +78,6 @@ public abstract class AbstractMatchMapper {
     }
 
 
-    public abstract List<MatchFromUserDto> toMatchFromUserDtoList(List<MatchPlayerEntity> matchPlayerEntityList);
-    protected abstract MatchFromUserDto toMatchFromUserDto(MatchPlayerEntity matchPlayerEntity);
+    public abstract List<MatchFromPlayerDto> toMatchFromPlayerDtoList(List<MatchPlayerEntity> matchPlayerEntityList);
+    protected abstract MatchFromPlayerDto toMatchFromPlayerDto(MatchPlayerEntity matchPlayerEntity);
 }
