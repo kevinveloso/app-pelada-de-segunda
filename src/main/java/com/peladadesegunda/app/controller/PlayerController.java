@@ -67,4 +67,9 @@ public class PlayerController {
     public ResponseEntity<List<PlayerDto>> getAllRegularMembers() {
         return ResponseEntity.ok(this.playerService.getAllRegularMembers());
     }
+
+    @GetMapping("/available-players/{matchId}")
+    public ResponseEntity<List<PlayerDto>> getAllAvailablePlayers(@PathVariable Long matchId, Pageable pageable) {
+        return ResponseEntity.ok(this.playerService.getAllAvailablePlayerFromMatch(matchId, pageable));
+    }
 }

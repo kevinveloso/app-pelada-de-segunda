@@ -2,7 +2,7 @@ package com.peladadesegunda.app.mapper;
 
 import com.peladadesegunda.app.dto.PlayerDto;
 import com.peladadesegunda.app.dto.UserDto;
-import com.peladadesegunda.app.enumeration.Position;
+import com.peladadesegunda.app.model.PlayerEntity;
 import com.peladadesegunda.app.model.UserEntity;
 import org.mapstruct.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +11,10 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public abstract class AbstractUserMapper {
-    @Mapping(target = "positionSet", source = "positionList")
+
+    @Autowired
+    protected AbstractPlayerMapper abstractPlayerMapper;
+
     public abstract UserEntity toUserEntity(UserDto userDto);
 
     protected PlayerEntity toPlayerEntity(PlayerDto playerDto) {
@@ -22,5 +25,7 @@ public abstract class AbstractUserMapper {
 
     public abstract UserDto toUserDto(UserEntity userEntity);
 
-    protected abstract List<Position> toPositionList(Set<Position> positionSet);
+    protected PlayerDto toPlayerDto(PlayerEntity playerEntity) {
+        return this.abstractPlayerMapper.toPlayerDto(playerEntity);
+    }
 }

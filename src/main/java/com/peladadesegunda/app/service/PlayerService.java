@@ -21,4 +21,6 @@ public interface PlayerService {
     void evaluatePerformances(PerformanceEvaluationDto performanceEvaluationDto);
 
     List<PlayerDto> getAllRegularMembers();
+
+    List<PlayerDto> getAllAvailablePlayerFromMatch(Long matchId, Pageable pageable);
 }
