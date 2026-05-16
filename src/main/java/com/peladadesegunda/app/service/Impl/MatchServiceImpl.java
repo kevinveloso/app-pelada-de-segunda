@@ -7,7 +7,6 @@ import com.peladadesegunda.app.mapper.AbstractPlayerMapper;
 import com.peladadesegunda.app.model.MatchEntity;
 import com.peladadesegunda.app.model.MatchPlayerEntity;
 import com.peladadesegunda.app.model.PlayerEntity;
-import com.peladadesegunda.app.model.UserEntity;
 import com.peladadesegunda.app.repository.MatchPlayerRepository;
 import com.peladadesegunda.app.repository.MatchRepository;
 import com.peladadesegunda.app.repository.PlayerRepository;
@@ -62,7 +61,12 @@ public class MatchServiceImpl implements MatchService {
     }
 
     @Override
-    public MatchDto createMatch(AddUpdateMatchDto match) {
+    public MatchDto createMatch(AddUpdateMatchDto match) throws MatchCreationNotAllowed {
+        Objects.requireNonNull(match.getMatchStartDate(), "Match start date can't be null.");
+        Objects.requireNonNull(match.getMatchEndDate(), "Match end date can't be null.");
+
+        if (!isMatchCreationAllowed(match)) throw new MatchCreationNotAllowed();
+
         MatchEntity matchEntity = this.matchMapper.toMatchEntity(match);
 
         List<PlayerEntity> regularMembersList = this.playerRepository.findByRegularMemberTrueOrderByNameAsc();
@@ -216,6 +220,18 @@ public class MatchServiceImpl implements MatchService {
         return null;
     }
 
+    @Override
+    public MatchDto getCurrentMatch() throws MatchNotFoundException {
+        Date now = new Date();
+        Optional<MatchEntity> matchEntityOptional = this.matchRepository.findByMatchStartDateLessThanEqualAndMatchEndDateGreaterThan(now, now);
+
+        if (matchEntityOptional.isEmpty()) {
+            throw new MatchNotFoundException("current");
+        }
+
+        return this.matchMapper.toMatchDto(matchEntityOptional.get());
+    }
+
     private MatchEntity getMatchIfExists(Long drawTeamsDto) throws MatchNotFoundException {
         Optional<MatchEntity> matchEntityOptional = this.matchRepository.findById(drawTeamsDto);
 
@@ -260,5 +276,18 @@ public class MatchServiceImpl implements MatchService {
 
         Collections.shuffle(listOfSubscribedPlayers);
         return listOfSubscribedPlayers;
+    }
+
+    private Boolean isMatchCreationAllowed(AddUpdateMatchDto match) {
+        Date now = new Date();
+
+        if (match.getMatchStartDate().after(now) && match.getMatchEndDate().after(match.getMatchStartDate())) {
+            List<MatchEntity> matchEntityList = this.matchRepository
+                    .findAllByMatchStartDateGreaterThanEqualAndMatchStartDateLessThan(match.getMatchStartDate(), match.getMatchEndDate());
+
+            return matchEntityList.isEmpty();
+        }
+
+        return false;
     }
 }

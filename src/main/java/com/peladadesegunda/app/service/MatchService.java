@@ -12,7 +12,7 @@ public interface MatchService {
 
     MatchDto getMatch(Long id) throws MatchNotFoundException;
 
-    MatchDto createMatch(AddUpdateMatchDto match);
+    MatchDto createMatch(AddUpdateMatchDto match) throws MatchCreationNotAllowed;
 
     MatchDto updateMatch(AddUpdateMatchDto match) throws MatchNotFoundException;
 
@@ -29,4 +29,6 @@ public interface MatchService {
     TeamsDto drawTeams(DrawTeamsDto drawTeamsDto) throws MatchNotFoundException, MatchIsOverException;
 
     MatchResultDto getMatchResult(Long matchId) throws MatchNotFoundException;
+
+    MatchDto getCurrentMatch() throws MatchNotFoundException;
 }
