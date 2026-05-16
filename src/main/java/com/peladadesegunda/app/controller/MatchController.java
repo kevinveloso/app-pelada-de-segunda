@@ -34,8 +34,12 @@ public class MatchController {
 
     @PostMapping
     public ResponseEntity<MatchDto> createMatch(@RequestBody AddUpdateMatchDto match) {
-        MatchDto createdMatch = this.matchService.createMatch(match);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdMatch);
+        try {
+            MatchDto createdMatch = this.matchService.createMatch(match);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdMatch);
+        } catch (MatchCreationNotAllowed e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
     }
 
     @PutMapping
@@ -106,6 +110,15 @@ public class MatchController {
     public ResponseEntity<MatchResultDto> getMatchResult(@PathVariable Long id) {
         try {
             return ResponseEntity.ok(this.matchService.getMatchResult(id));
+        } catch (MatchNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    @GetMapping("/current")
+    public ResponseEntity<MatchDto> getCurrentMatch() {
+        try {
+            return ResponseEntity.ok(this.matchService.getCurrentMatch());
         } catch (MatchNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
