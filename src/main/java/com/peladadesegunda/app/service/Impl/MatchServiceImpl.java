@@ -271,7 +271,7 @@ public class MatchServiceImpl implements MatchService {
         listOfSubscribedPlayers.sort(Comparator.comparing(MatchPlayerEntity::getSubscriptionDate));
 
         if (listOfSubscribedPlayers.size() > match.getMaxPlayers()) {
-            listOfSubscribedPlayers = listOfSubscribedPlayers.subList(match.getMaxPlayers(), listOfSubscribedPlayers.size());
+            listOfSubscribedPlayers = listOfSubscribedPlayers.subList(0, match.getMaxPlayers());
         }
 
         Collections.shuffle(listOfSubscribedPlayers);
